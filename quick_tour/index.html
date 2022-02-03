@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="mingchao.wang">
+    <link rel="shortcut icon" href="../img/favicon.ico">
+    <title>Quick tour &mdash; accelerate</title>
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:400,700">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/tonsky/FiraCode@1.206/distr/fira_code.css">
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.8.1/css/all.css">
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.8.1/css/v4-shims.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script> 
+</head>
+
+<body ontouchstart="">
+    <div id="container">
+        <aside>
+            <div class="home">
+                <div class="logo">
+                    <a  href="..">
+                        <img src="https://huggingface.co/landing/assets/transformers-docs/huggingface_logo.svg">
+                    </a>
+                </div>
+                <div class="version">v0.5.1</div>
+                <div class="title">
+                    <button class="hamburger"></button>
+                    <a href=".." class="site-name"> accelerate</a>
+                </div>
+                <div class="search">
+                    <div role="search">
+    <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+        <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+    </form>
+</div>
+                </div>
+            </div>
+            <nav class="nav">
+                <ul class="root">
+                    <li class="toctree-l1"><div class="section nav-item">Get Started</div>
+<!--<button class="section nav-item">Get Started</button>-->
+<ul class="subnav">
+    <li class="toctree-l2 current"><a class="nav-item current" href="./">Quick tour</a>
+<ul class="subnav">
+<li class="toctree-l3"><a class="nav-item toc" href="#_1">主要用法</a></li>
+<li class="toctree-l3"><a class="nav-item toc" href="#_2">分布式评估</a></li>
+<li class="toctree-l3"><a class="nav-item toc" href="#_3">运行分布式脚本</a></li>
+<li class="toctree-l3"><a class="nav-item toc" href="#notebook">使用notebook运行</a></li>
+<li class="toctree-l3"><a class="nav-item toc" href="#tpu">在TPU上训练</a></li>
+<li class="toctree-l3"><a class="nav-item toc" href="#_4">其他注意点说明</a></li>
+<li class="toctree-l3"><a class="nav-item toc" href="#_9">内部原理和机制</a></li>
+</ul></li>
+    <li class="toctree-l2">
+<a class="nav-item" href="../installation.md">Installation</a></li>
+</ul></li>
+                    <li class="toctree-l1"><div class="section nav-item">API Reference</div>
+<!--<button class="section nav-item">API Reference</button>-->
+<ul class="subnav">
+    <li class="toctree-l2">
+<a class="nav-item" href="../accelerator/">Accelerator</a></li>
+    <li class="toctree-l2">
+<a class="nav-item" href="../notebook_launcher/">Notebook Launcher</a></li>
+    <li class="toctree-l2">
+<a class="nav-item" href="../kwargs_handlers/">Kwargs Handlers</a></li>
+    <li class="toctree-l2">
+<a class="nav-item" href="../internals/">Internals</a></li>
+</ul></li>
+                </ul>
+            </nav>
+        </aside>
+<!--        <div id="spacer"><button class="arrow"></button></div>-->
+        <main>
+            <div class="home-top">
+                <button class="hamburger"></button>
+                <a href=".." class="site-name"> accelerate</a>
+            </div>
+            <div id="main">
+                <div class="main-content">
+                    <div class="repo">
+    <div class="git-link">
+        <a href="https://github.com/huggingface/accelerate" class="fa fa-github"> GitHub</a>
+    </div>
+    <div class="src_en_doc"><a href="https://huggingface.co/docs/accelerate/index.html"> 英文原版文档 </a></div>
+</div>
+                    <nav class="breadcrumbs">
+<ul>
+    <li>
+        <a href="..">Docs</a>
+        &raquo;
+    </li>
+    <li>Get Started</li><li> &raquo; </li>
+    <li> Quick tour</li>
+</ul>
+</nav>
+                    <hr>
+                    <div class="content"><h1 id="quick-tour">Quick tour</h1>
+<h2 id="_1">主要用法</h2>
+<p>在之前的文档 <a href="./Accelerate.md">Accelerate</a> 中已经看到过要想使用Accelerate需要做的代码修改如下所示：</p>
+<div><pre>
+<font color=green>+ from accelerate import Accelerator</font>
+<span></span>
+<font color=green>+ accelerator = Accelerator()</font>
+<font color=red>- my_model.to(device)</font>
+<font>  # Pass every important object (model, optimizer, dataloader) to `accelerator.prepare`</font>
+<font color=green>+ my_model, my_optimizer, my_training_dataloader = accelerate.prepare(</font>
+<font color=green>+     my_model, my_optimizer, my_training_dataloader</font>
+<font color=green>+ )</font>
+<span></span>
+<font>  for batch in my_training_dataloader:</font>
+<font>      my_optimizer.zero_grad()</font>
+<font>      inputs, targets = batch</font>
+<font color=red>-     inputs = inputs.to(device)</font>
+<font color=red>-     targets = targets.to(device)</font>
+<font>      outputs = my_model(inputs)</font>
+<font>      loss = my_loss_function(outputs, targets)</font>
+<font>      # Just a small change for the backward instruction</font>
+<font color=red>-     loss.backward()</font>
+<font color=green>+     accelerate.backward(loss)</font>
+<font>      my_optimizer.step()</font>
+</pre></div>
+
+<p>上述代码的修改可以分为四个步骤进行：</p>
+<ol>
+<li>import 并实例化 Accelerator 对象，代码如下：</li>
+</ol>
+<pre><code class="language-python">from accelerate import Accelerator
+
+accelerator = Accelerator()
+</code></pre>
+<p>上述这个初始化代码会自动检测设备和环境信息（单CPU、多CPU、单GPU、多GPU、TPU等等都会自动检测到），开发者完全不需要关心设备和环境信息。</p>
+<p>需要注意的一点是：上述初始化代码必须要在所有训练有关的代码之前执行；</p>
+<ol>
+<li>删除原代码中的 <code>to(device)</code> 和 <code>cuda()</code>，Accelerator 会自动将model、data等放到正确的设备上，开发者不用关心。</li>
+</ol>
+<p>当然，如果是高端玩家想要自己指定设备信息也可以，此时 <code>to(device)</code> 中的 <code>device</code> 需要是 <code>accelerator.device</code>。</p>
+<p>最后，如果完全不想使用 Accelerator 自动管理设备的功能，可以在初始化时传入参数 <code>device_placement=False</code>，代码如下：</p>
+<pre><code class="language-python">accelerator = Accelerator(device_placement=False)
+</code></pre>
+<ol>
+<li>将所有和训练相关的对象（<code>optimizer</code>, <code>model</code>, <code>training dataloader</code>）传入函数 <code>prepare()</code>。该步骤应该放在所有相关对象初始化之后，和训练开始之前。代码如下：</li>
+</ol>
+<pre><code>model, optimizer, train_dataloader = accelerator.prepare(model, optimizer, train_dataloader)
+</code></pre>
+<p><strong>对 <code>train_dataloader</code> 说明</strong>：当做分布式训练时，以多GPU为例，所有的训练数据会平均分配到每个GPU上。当训练数据需要 shuffle 时，其实现原理是：</p>
+<ul>
+<li>将随机状态（random state）同步到所有的GPU，以此保证每个GPU上训练数据 shuffle 之后的顺序是相同的；</li>
+<li>每个GPU读取 shuffle 后的训练数据的不同片段；比如有2个GPU时，第一个GPU读取第 <code>[1, 3, 5, 7, ...]</code> 条数据，第二个GPU读取第 <code>[0, 2, 4, 6, ...]</code> 条数据；</li>
+</ul>
+<p><strong>对 <code>batch_size</code> 说明</strong>：当做分布式训练时，以多GPU为例：实际的batch_size = 输入的batch_size * GPU数量。比如输入batch_size为16，当使用4个GPU进行分布式训练时，实际的batch_size为64。</p>
+<p><strong>对 <code>validation dataloader</code> 说明</strong>：上面传入 <code>prepare()</code> 的只有 <code>train_dataloader</code>，另外 <code>validation dataloader</code> 也可以传入 <code>prepare()</code>，具体的使用方式见下面的<strong>分布式评估</strong>部分。</p>
+<ol>
+<li>将 <code>loss.backward()</code> 替换成 <code>accelerator.backward(loss)</code>。</li>
+</ol>
+<p>完成以上四个步骤之后就可以正常的使用 Accelerator 了。</p>
+<h2 id="_2">分布式评估</h2>
+<p>如果要做分布式评估，只需要将 <code>validation_dataloader</code> 也传入 <code>prepare()</code>，代码如下：</p>
+<pre><code class="language-python">validation_dataloader = accelerator.prepare(validation_dataloader)
+</code></pre>
+<p>和 <code>train_dataloader</code> 的实现原理类似，<code>validation_dataloader</code> 中所有的数据会被划分到多个GPU上，所以在模型前向传播完成之后要调用函数 <code>gather()</code> 做一下聚合，代码如下：</p>
+<pre><code class="language-python">for inputs, targets in validation_dataloader:
+    predictions = model(inputs)
+    # Gather all predictions and targets
+    all_predictions = accelerator.gather(predictions)
+    all_targets = accelerator.gather(targets)
+    # Example of use with a `Datasets.Metric`
+    metric.add_batch(all_predictions, all_targets)
+</code></pre>
+<p>注意：函数 <code>gather()</code> 要求所有的 tensor 具有相同的维度。比如：每个GPU上的数据在 padding 时，padding 的最大长度设置为当前这个 <code>mini_batch=16</code> 条数据中长度最大的那条数据的长度，就会导致多个GPU之间的 tensor 的维度不同，此时函数 <code>gather()</code> 不能正常工作。</p>
+<h2 id="_3">运行分布式脚本</h2>
+<p>没有看</p>
+<h2 id="notebook">使用notebook运行</h2>
+<p>没有看</p>
+<h2 id="tpu">在TPU上训练</h2>
+<p>我哪有TPU</p>
+<h2 id="_4">其他注意点说明</h2>
+<h3 id="_5">程序只在一个进程中执行</h3>
+<blockquote>
+<p>注：todo 这里需要看一下原文档中的 <code>process</code> 是否真的是平时所说的 "进程" 的意思？看源码确认一下；</p>
+</blockquote>
+<p>在分布式训练的时候，以多GPU为例，我们的程序会同时运行在多张显卡上。那么比如打印日志、打印进度条等功能，只希望其执行一次就行了，否则如果有8张显卡，同一条日志打印8次看起来很不方便。</p>
+<p>想要实现并发训练时程序只执行一次，只需将程序包到如下 <code>if</code> 判断内部即可：</p>
+<pre><code class="language-python">if accelerator.is_local_main_process:
+    # Is executed once per server
+</code></pre>
+<p>其中标志 <code>accelerator.is_local_main_process</code> 就表示是否在主进程中。在这个 <code>if</code> 判断内部的代码，如果不是在主进程中，是不会执行的。</p>
+<p>像打印进度条的 <code>tqdm</code> 库，可以按照如下方式使用：</p>
+<pre><code class="language-python">from tqdm.auto import tqdm
+
+progress_bar = tqdm(range(args.max_train_steps), disable=not accelerator.is_local_main_process)
+</code></pre>
+<p>类似的，只有在主进程中才会打印进度条；</p>
+<p>标志 <code>accelerator.is_local_main_process</code> 中的 <code>local</code> 是当前机器；当多机多GPU时，该标志在每台机器的主进程中都是True。在多机多GPU的情况下如果想要只在一台机器的主进程中执行，可以使用如下代码：</p>
+<pre><code class="language-python">if accelerator.is_main_process:
+    # Is executed once only
+</code></pre>
+<p>最后，由于 <code>print</code> 函数使用比较频繁，每次包到 <code>if</code> 分支中比较麻烦，accelerator对其单独做了处理。直接使用 <code>accelerator.print</code> 即可实现在每台机器中只打印一次的功能。</p>
+<h3 id="_6">等待所有进程完成，再继续执行</h3>
+<p>在进行分布式训练时，不可避免的会出现有的进程执行的快、有的进程执行的慢的情况。而有些时候我们希望每个进程都已经执行完了各自需要执行的内容之后，再进行后面的。可以使用如下代码实现该功能：</p>
+<pre><code class="language-python">accelerator.wait_for_everyone()
+</code></pre>
+<p>这行代码的作用为：先执行到这行代码的进程阻塞，一直等待到所有的进程都执行到了这行代码之后，再同时开始执行后面的代码；</p>
+<p>如果是只有一个进程，那么上面这行代码什么都不做。</p>
+<h3 id="_7">保存和加载模型</h3>
+<h3 id="gradient-clipping">Gradient clipping</h3>
+<p>如果之前在训练过程中使用了 gradient clipping，那么需要:</p>
+<ul>
+<li>
+<p>使用函数 <code>accelerator.clip_grad_norm_</code> 替换原来的 <code>torch.nn.utils.clip_grad_norm_</code>；</p>
+</li>
+<li>
+<p>使用函数 <code>accelerator.clip_grad_value_</code> 替换原来的 <code>torch.nn.utils.clip_grad_value_</code>；</p>
+</li>
+</ul>
+<h3 id="_8">混合精度</h3>
+<h3 id="deepspeed">DeepSpeed</h3>
+<h2 id="_9">内部原理和机制</h2></div>
+                </div>
+                <footer>
+    <div class="footer-buttons">
+        <div class="previous"><a href=".." title="Accelerate"><span>Previous</span></a></div>
+        <div class="next"><a href="../accelerator/" title="Accelerator"><span>Next</span></a></div>
+    </div>
+    <div class="footer-note">
+        <p>
+            Built with <a href="http://www.mkdocs.org">MkDocs</a> using
+            <a>Huggingface Doc Theme</a>.
+        </p>
+    </div>
+</footer>
+            </div>
+        </main>
+    </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js"></script>
+    <script src="../search/main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="accelerate">
+    <meta name="author" content="mingchao.wang">
+    <link rel="shortcut icon" href="img/favicon.ico">
+    <title>Accelerate &mdash; accelerate</title>
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:400,700">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/tonsky/FiraCode@1.206/distr/fira_code.css">
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.8.1/css/all.css">
+    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.8.1/css/v4-shims.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script> 
+</head>
+
+<body ontouchstart="">
+    <div id="container">
+        <aside>
+            <div class="home">
+                <div class="logo">
+                    <a  href=".">
+                        <img src="https://huggingface.co/landing/assets/transformers-docs/huggingface_logo.svg">
+                    </a>
+                </div>
+                <div class="version">v0.5.1</div>
+                <div class="title">
+                    <button class="hamburger"></button>
+                    <a href="." class="site-name"> accelerate</a>
+                </div>
+                <div class="search">
+                    <div role="search">
+    <form id="rtd-search-form" class="wy-form" action="./search.html" method="get">
+        <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+    </form>
+</div>
+                </div>
+            </div>
+            <nav class="nav">
+                <ul class="root">
+                    <li class="toctree-l1"><div class="section nav-item">Get Started</div>
+<!--<button class="section nav-item">Get Started</button>-->
+<ul class="subnav">
+    <li class="toctree-l2"><a class="nav-item" href="quick_tour/">Quick tour</a></li>
+    <li class="toctree-l2">
+<a class="nav-item" href="installation.md">Installation</a></li>
+</ul></li>
+                    <li class="toctree-l1"><div class="section nav-item">API Reference</div>
+<!--<button class="section nav-item">API Reference</button>-->
+<ul class="subnav">
+    <li class="toctree-l2">
+<a class="nav-item" href="accelerator/">Accelerator</a></li>
+    <li class="toctree-l2">
+<a class="nav-item" href="notebook_launcher/">Notebook Launcher</a></li>
+    <li class="toctree-l2">
+<a class="nav-item" href="kwargs_handlers/">Kwargs Handlers</a></li>
+    <li class="toctree-l2">
+<a class="nav-item" href="internals/">Internals</a></li>
+</ul></li>
+                </ul>
+            </nav>
+        </aside>
+<!--        <div id="spacer"><button class="arrow"></button></div>-->
+        <main>
+            <div class="home-top">
+                <button class="hamburger"></button>
+                <a href="." class="site-name"> accelerate</a>
+            </div>
+            <div id="main">
+                <div class="main-content">
+                    <div class="repo">
+    <div class="git-link">
+        <a href="https://github.com/huggingface/accelerate" class="fa fa-github"> GitHub</a>
+    </div>
+    <div class="src_en_doc"><a href="https://huggingface.co/docs/accelerate/index.html"> 英文原版文档 </a></div>
+</div>
+                    <nav class="breadcrumbs">
+<ul>
+    <li>
+        <a href=".">Docs</a>
+        &raquo;
+    </li>
+    
+    <li> Accelerate</li>
+</ul>
+</nav>
+                    <hr>
+                    <div class="content"><h1 id="accelerate">Accelerate</h1>
+<h3 id="_1">特征</h3>
+<ul>
+<li>
+<p>提供混合精度、分布式训练（单多GPU、多机多GPU、TPU等等）等功能，在原训练代码的基础上只需要修改少量代码；</p>
+</li>
+<li>
+<p>提供命令行工具可以快速测试本地环境</p>
+</li>
+</ul>
+<h3 id="_2">用法简单，代码修改量少</h3>
+<p>传统的使用pytorch的训练代码一般如下：</p>
+<pre><code class="language-python">my_model.to(device)
+
+for batch in my_training_dataloader:
+    my_optimizer.zero_grad()
+    inputs, targets = batch
+    inputs = inputs.to(device)
+    targets = targets.to(device)
+    outputs = my_model(inputs)
+    loss = my_loss_function(outputs, targets)
+    loss.backward()
+    my_optimizer.step()
+</code></pre>
+<p>如果要使用accelerate只需做如下代码的修改就可以轻松运行到分布式环境下：</p>
+<div><pre>
+<font color=green>+ from accelerate import Accelerator</font>
+<span></span>
+<font color=green>+ accelerator = Accelerator()</font>
+<font>  # Use the device given by the `accelerator` object.</font>
+<font color=green>+ device = accelerator.device</font>
+<font>  my_model.to(device)</font>
+<font>  # Pass every important object (model, optimizer, dataloader) to `accelerator.prepare`</font>
+<font color=green>+ my_model, my_optimizer, my_training_dataloader = accelerate.prepare(</font>
+<font color=green>+     my_model, my_optimizer, my_training_dataloader</font>
+<font color=green>+ )</font>
+<span></span>
+<span>  for batch in my_training_dataloader:</span>
+<font>      my_optimizer.zero_grad()</font>
+<font>      inputs, targets = batch</font>
+<font>      inputs = inputs.to(device)</font>
+<font>      targets = targets.to(device)</font>
+<font>      outputs = my_model(inputs)</font>
+<font>      loss = my_loss_function(outputs, targets)</font>
+<font>      # Just a small change for the backward instruction</font>
+<font color=red>-     loss.backward()</font>
+<font color=green>+     accelerate.backward(loss)</font>
+<font>      my_optimizer.step()</font>
+</pre></div>
+
+<p>上述方式还需要自己通过函数 <code>to(device)</code> 指定设备，更推荐的用法是由 Accelerator 自动管理设备信息，代码如下：</p>
+<div><pre>
+<font color=green>+ from accelerate import Accelerator</font>
+<span></span>
+<font color=green>+ accelerator = Accelerator()</font>
+<font color=red>- my_model.to(device)</font>
+<font>  # Pass every important object (model, optimizer, dataloader) to `accelerator.prepare`</font>
+<font color=green>+ my_model, my_optimizer, my_training_dataloader = accelerate.prepare(</font>
+<font color=green>+     my_model, my_optimizer, my_training_dataloader</font>
+<font color=green>+ )</font>
+<span></span>
+<font>  for batch in my_training_dataloader:</font>
+<font>      my_optimizer.zero_grad()</font>
+<font>      inputs, targets = batch</font>
+<font color=red>-     inputs = inputs.to(device)</font>
+<font color=red>-     targets = targets.to(device)</font>
+<font>      outputs = my_model(inputs)</font>
+<font>      loss = my_loss_function(outputs, targets)</font>
+<font>      # Just a small change for the backward instruction</font>
+<font color=red>-     loss.backward()</font>
+<font color=green>+     accelerate.backward(loss)</font>
+<font>      my_optimizer.step()</font>
+</pre></div>
+
+<h3 id="_3">支持的分布式环境（非分布式也支持）</h3>
+<ul>
+<li>
+<p>CPU only</p>
+</li>
+<li>
+<p>single GPU</p>
+</li>
+<li>
+<p>multi-GPU on one node (machine)</p>
+</li>
+<li>
+<p>multi-GPU on several nodes (machines)</p>
+</li>
+<li>
+<p>TPU</p>
+</li>
+<li>
+<p>FP16 with native AMP (apex on the roadmap)</p>
+</li>
+<li>
+<p>DeepSpeed (experimental support)</p>
+</li>
+</ul>
+<h3 id="_4">目录</h3></div>
+                </div>
+                <footer>
+    <div class="footer-buttons">
+        <div class="next"><a href="quick_tour/" title="Quick tour"><span>Next</span></a></div>
+    </div>
+    <div class="footer-note">
+        <p>
+            Built with <a href="http://www.mkdocs.org">MkDocs</a> using
+            <a>Huggingface Doc Theme</a>.
+        </p>
+    </div>
+</footer>
+            </div>
+        </main>
+    </div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme.js"></script>
+    <script src="search/main.js"></script>
+</body>
+
+</html>
