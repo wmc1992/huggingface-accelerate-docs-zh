@@ -1,0 +1,17 @@
+{% if page %}
+<ul>
+    <li>
+        <a href="{{ nav.homepage.url|url }}">Docs</a>
+        &raquo;
+    </li>
+    {% for doc in page.ancestors|reverse -%}
+        {%- if doc.link -%}
+        <li>< href="{{ doc.link|e }}">{{ doc.title }}</li>
+        {%- else -%}
+        <li>{{ doc.title }}</li>
+        {%- endif -%}
+        <li> &raquo; </li>
+    {%- endfor %}
+    <li> {{ page.title }}</li>
+</ul>
+{% endif %}

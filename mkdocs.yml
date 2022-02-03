@@ -1,0 +1,27 @@
+site_name: accelerate
+site_url: https://www.example.com/
+site_description: accelerate
+site_author: mingchao.wang
+
+repo_url: https://github.com/huggingface/accelerate
+edit_uri: ""
+
+theme:
+    name: mkdocs
+    custom_dir: huggingface-accelerate-theme
+
+nav:
+  - Accelerate: README.md
+  - Get Started:
+      - Quick tour: quick_tour.md
+      - Installation: installation.md
+  - API Reference:
+      - Accelerator: accelerator.md
+      - Notebook Launcher: notebook_launcher.md
+      - Kwargs Handlers: kwargs_handlers.md
+      - Internals: internals.md
+
+en_doc_url: https://huggingface.co/docs/accelerate/index.html
+doc_version: v0.5.1
+
+#extra_css: [ extra.css ]

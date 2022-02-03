@@ -1,0 +1,16 @@
+<div class="repo">
+    {%- if config.repo_name %}
+    <div class="git-link">
+        {%- if config.repo_name == 'GitHub' %}
+        <a href="{{ config.repo_url }}" class="fa fa-github"> GitHub</a>
+        {%- elif config.repo_name == 'Bitbucket' %}
+        <a href="{{ config.repo_url }}" class="icon icon-bitbucket"> BitBucket</a>
+        {%- elif config.repo_name == 'GitLab' %}
+        <a href="{{ config.repo_url }}" class="icon icon-gitlab"> GitLab</a>
+        {%- endif %}
+    </div>
+    {%- endif %}
+    {%- if config.en_doc_url %}
+    <div class="src_en_doc"><a href="{{ config.en_doc_url }}"> 英文原版文档 </a></div>
+    {%- endif %}
+</div>
