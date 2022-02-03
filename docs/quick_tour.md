@@ -4,7 +4,7 @@
 
 在之前的文档 [Accelerate](./Accelerate.md) 中已经看到过要想使用Accelerate需要做的代码修改如下所示：
 
-<div><pre>
+<div><pre><code class="language-python hljs">
 <font color=green>+ from accelerate import Accelerator</font>
 <span></span>
 <font color=green>+ accelerator = Accelerator()</font>
@@ -25,7 +25,7 @@
 <font color=red>-     loss.backward()</font>
 <font color=green>+     accelerate.backward(loss)</font>
 <font>      my_optimizer.step()</font>
-</pre></div>
+</code></pre></div>
 
 上述代码的修改可以分为四个步骤进行：
 

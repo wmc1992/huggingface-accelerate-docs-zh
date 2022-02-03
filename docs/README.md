@@ -26,7 +26,10 @@ for batch in my_training_dataloader:
 
 如果要使用accelerate只需做如下代码的修改就可以轻松运行到分布式环境下：
 
-<div><pre>
+
+<div>
+<pre>
+<code class="language-python hljs">
 <font color=green>+ from accelerate import Accelerator</font>
 <span></span>
 <font color=green>+ accelerator = Accelerator()</font>
@@ -49,12 +52,14 @@ for batch in my_training_dataloader:
 <font color=red>-     loss.backward()</font>
 <font color=green>+     accelerate.backward(loss)</font>
 <font>      my_optimizer.step()</font>
-</pre></div>
+</code>
+</pre>
+</div>
 
 
 上述方式还需要自己通过函数 `to(device)` 指定设备，更推荐的用法是由 Accelerator 自动管理设备信息，代码如下：
 
-<div><pre>
+<div><pre><code class="language-python hljs">
 <font color=green>+ from accelerate import Accelerator</font>
 <span></span>
 <font color=green>+ accelerator = Accelerator()</font>
@@ -75,7 +80,7 @@ for batch in my_training_dataloader:
 <font color=red>-     loss.backward()</font>
 <font color=green>+     accelerate.backward(loss)</font>
 <font>      my_optimizer.step()</font>
-</pre></div>
+</code></pre></div>
 
 ### 支持的分布式环境（非分布式也支持）
 
