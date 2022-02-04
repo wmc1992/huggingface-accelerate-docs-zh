@@ -1,12 +1,12 @@
 # Accelerate
 
-### 特征
+## 特征
 
 * 提供混合精度、分布式训练（单多GPU、多机多GPU、TPU等等）等功能，在原训练代码的基础上只需要修改少量代码；
 
 * 提供命令行工具可以快速测试本地环境
 
-### 用法简单，代码修改量少
+## 用法简单，代码修改量少
 
 传统的使用pytorch的训练代码一般如下：
 
@@ -82,20 +82,39 @@ for batch in my_training_dataloader:
 <font>      my_optimizer.step()</font>
 </code></pre></div>
 
-### 支持的分布式环境（非分布式也支持）
+## 支持的环境
 
-* CPU only
+* CPU
 
-* single GPU
+* 单GPU
 
-* multi-GPU on one node (machine)
+* 多GPU单节点
 
-* multi-GPU on several nodes (machines)
+* 多GPU多节点
 
 * TPU
 
-* FP16 with native AMP (apex on the roadmap)
+* FP16 with native AMP
 
-* DeepSpeed (experimental support)
+* DeepSpeed
 
-### 目录
+## 目录
+
+#### Get Started
+
+* [Quick tour](./quick_tour.md)
+    * 主要用法
+    * 分布式评估
+    * 运行分布式脚本
+    * 使用notebook运行
+    * 在TPU上训练
+    * 其他注意点说明
+    * 内部原理和机制
+* [Installation](./Installation.md)
+
+#### API Reference
+
+* [Accelerate](./accelerator.md)
+* [Notebook Launcher](./notebook_launcher.md)
+* [Kwargs Handlers](./kwargs_handlers.md)
+* [Internals](./internals.md)
