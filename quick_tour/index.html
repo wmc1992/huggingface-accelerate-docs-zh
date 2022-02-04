@@ -103,7 +103,7 @@
                     <hr>
                     <div class="content"><h1 id="quick-tour">Quick tour</h1>
 <h2 id="_1">主要用法</h2>
-<p>在之前的文档 <a href="./Accelerate.md">Accelerate</a> 中已经看到过要想使用Accelerate需要做的代码修改如下所示：</p>
+<p>在之前的文档 <a href="..">Accelerate</a> 中已经看到过要想使用Accelerate需要做的代码修改如下所示：</p>
 <div><pre><code class="language-python hljs">
 <font color=green>+ from accelerate import Accelerator</font>
 <span></span>
@@ -128,37 +128,32 @@
 </code></pre></div>
 
 <p>上述代码的修改可以分为四个步骤进行：</p>
-<ol>
-<li>import 并实例化 Accelerator 对象，代码如下：</li>
-</ol>
+<p><strong>步骤一</strong>：import 并实例化 Accelerator 对象，代码如下：</p>
 <pre><code class="language-python">from accelerate import Accelerator
 
 accelerator = Accelerator()
 </code></pre>
 <p>上述这个初始化代码会自动检测设备和环境信息（单CPU、多CPU、单GPU、多GPU、TPU等等都会自动检测到），开发者完全不需要关心设备和环境信息。</p>
 <p>需要注意的一点是：上述初始化代码必须要在所有训练有关的代码之前执行；</p>
-<ol>
-<li>删除原代码中的 <code>to(device)</code> 和 <code>cuda()</code>，Accelerator 会自动将model、data等放到正确的设备上，开发者不用关心。</li>
-</ol>
+<p><strong>步骤二</strong>：删除原代码中的 <code>to(device)</code> 和 <code>cuda()</code>，Accelerator 会自动将model、data等放到正确的设备上，开发者不用关心。</p>
 <p>当然，如果是高端玩家想要自己指定设备信息也可以，此时 <code>to(device)</code> 中的 <code>device</code> 需要是 <code>accelerator.device</code>。</p>
 <p>最后，如果完全不想使用 Accelerator 自动管理设备的功能，可以在初始化时传入参数 <code>device_placement=False</code>，代码如下：</p>
 <pre><code class="language-python">accelerator = Accelerator(device_placement=False)
 </code></pre>
-<ol>
-<li>将所有和训练相关的对象（<code>optimizer</code>, <code>model</code>, <code>training dataloader</code>）传入函数 <code>prepare()</code>。该步骤应该放在所有相关对象初始化之后，和训练开始之前。代码如下：</li>
-</ol>
-<pre><code>model, optimizer, train_dataloader = accelerator.prepare(model, optimizer, train_dataloader)
+<p><strong>步骤三</strong>：将所有和训练相关的对象（<code>optimizer</code>, <code>model</code>, <code>training dataloader</code>）传入函数 <code>prepare()</code>。该步骤应该放在所有相关对象初始化之后，和训练开始之前。代码如下：</p>
+<pre><code class="language-python">model, optimizer, train_dataloader = accelerator.prepare(model, optimizer, train_dataloader)
 </code></pre>
-<p><strong>对 <code>train_dataloader</code> 说明</strong>：当做分布式训练时，以多GPU为例，所有的训练数据会平均分配到每个GPU上。当训练数据需要 shuffle 时，其实现原理是：</p>
+<blockquote>
+<p><strong>注意：</strong></p>
+<p><strong><code>train_dataloader</code></strong>：当做分布式训练时，以多GPU为例，所有的训练数据会平均分配到每个GPU上。当训练数据需要 shuffle 时，其实现原理是：</p>
 <ul>
 <li>将随机状态（random state）同步到所有的GPU，以此保证每个GPU上训练数据 shuffle 之后的顺序是相同的；</li>
 <li>每个GPU读取 shuffle 后的训练数据的不同片段；比如有2个GPU时，第一个GPU读取第 <code>[1, 3, 5, 7, ...]</code> 条数据，第二个GPU读取第 <code>[0, 2, 4, 6, ...]</code> 条数据；</li>
 </ul>
-<p><strong>对 <code>batch_size</code> 说明</strong>：当做分布式训练时，以多GPU为例：实际的batch_size = 输入的batch_size * GPU数量。比如输入batch_size为16，当使用4个GPU进行分布式训练时，实际的batch_size为64。</p>
-<p><strong>对 <code>validation dataloader</code> 说明</strong>：上面传入 <code>prepare()</code> 的只有 <code>train_dataloader</code>，另外 <code>validation dataloader</code> 也可以传入 <code>prepare()</code>，具体的使用方式见下面的<strong>分布式评估</strong>部分。</p>
-<ol>
-<li>将 <code>loss.backward()</code> 替换成 <code>accelerator.backward(loss)</code>。</li>
-</ol>
+<p><strong><code>batch_size</code></strong>：当做分布式训练时，以多GPU为例：实际的batch_size = 输入的batch_size * GPU数量。比如输入batch_size为16，当使用4个GPU进行分布式训练时，实际的batch_size为64。</p>
+<p><strong><code>validation dataloader</code></strong>：上面传入 <code>prepare()</code> 的只有 <code>train_dataloader</code>，另外 <code>validation dataloader</code> 也可以传入 <code>prepare()</code>，具体的使用方式见下面的<strong>分布式评估</strong>部分。</p>
+</blockquote>
+<p><strong>步骤四</strong>：将 <code>loss.backward()</code> 替换成 <code>accelerator.backward(loss)</code>。</p>
 <p>完成以上四个步骤之后就可以正常的使用 Accelerator 了。</p>
 <h2 id="_2">分布式评估</h2>
 <p>如果要做分布式评估，只需要将 <code>validation_dataloader</code> 也传入 <code>prepare()</code>，代码如下：</p>
@@ -182,9 +177,6 @@ accelerator = Accelerator()
 <p>我哪有TPU</p>
 <h2 id="_4">其他注意点说明</h2>
 <h3 id="_5">程序只在一个进程中执行</h3>
-<blockquote>
-<p>注：todo 这里需要看一下原文档中的 <code>process</code> 是否真的是平时所说的 "进程" 的意思？看源码确认一下；</p>
-</blockquote>
 <p>在分布式训练的时候，以多GPU为例，我们的程序会同时运行在多张显卡上。那么比如打印日志、打印进度条等功能，只希望其执行一次就行了，否则如果有8张显卡，同一条日志打印8次看起来很不方便。</p>
 <p>想要实现并发训练时程序只执行一次，只需将程序包到如下 <code>if</code> 判断内部即可：</p>
 <pre><code class="language-python">if accelerator.is_local_main_process:
