@@ -50,16 +50,15 @@
 <ul class="subnav">
     <li class="toctree-l2 current"><a class="nav-item current" href="./">Quick tour</a>
 <ul class="subnav">
-<li class="toctree-l3"><a class="nav-item toc" href="#_1">主要用法</a></li>
-<li class="toctree-l3"><a class="nav-item toc" href="#_2">分布式评估</a></li>
-<li class="toctree-l3"><a class="nav-item toc" href="#_3">运行分布式脚本</a></li>
-<li class="toctree-l3"><a class="nav-item toc" href="#notebook">使用notebook运行</a></li>
-<li class="toctree-l3"><a class="nav-item toc" href="#tpu">在TPU上训练</a></li>
-<li class="toctree-l3"><a class="nav-item toc" href="#_4">其他注意点说明</a></li>
-<li class="toctree-l3"><a class="nav-item toc" href="#_9">内部原理和机制</a></li>
+<li class="toctree-l3"><a class="nav-item toc" href="#1">1、主要用法</a></li>
+<li class="toctree-l3"><a class="nav-item toc" href="#2">2、分布式评估</a></li>
+<li class="toctree-l3"><a class="nav-item toc" href="#3">3、运行分布式脚本</a></li>
+<li class="toctree-l3"><a class="nav-item toc" href="#4notebook">4、使用notebook运行</a></li>
+<li class="toctree-l3"><a class="nav-item toc" href="#5tpu">5、在TPU上训练</a></li>
+<li class="toctree-l3"><a class="nav-item toc" href="#6">6、其他注意点说明</a></li>
+<li class="toctree-l3"><a class="nav-item toc" href="#7">7、内部原理和机制</a></li>
 </ul></li>
-    <li class="toctree-l2">
-<a class="nav-item" href="../installation.md">Installation</a></li>
+    <li class="toctree-l2"><a class="nav-item" href="../Installation/">Installation</a></li>
 </ul></li>
                     <li class="toctree-l1"><div class="section nav-item">API Reference</div>
 <!--<button class="section nav-item">API Reference</button>-->
@@ -102,7 +101,7 @@
 </nav>
                     <hr>
                     <div class="content"><h1 id="quick-tour">Quick tour</h1>
-<h2 id="_1">主要用法</h2>
+<h2 id="1">1、主要用法</h2>
 <p>在之前的文档 <a href="..">Accelerate</a> 中已经看到过要想使用Accelerate需要做的代码修改如下所示：</p>
 <div><pre><code class="language-python hljs">
 <font color=green>+ from accelerate import Accelerator</font>
@@ -155,7 +154,7 @@ accelerator = Accelerator()
 </blockquote>
 <p><strong>步骤四</strong>：将 <code>loss.backward()</code> 替换成 <code>accelerator.backward(loss)</code>。</p>
 <p>完成以上四个步骤之后就可以正常的使用 Accelerator 了。</p>
-<h2 id="_2">分布式评估</h2>
+<h2 id="2">2、分布式评估</h2>
 <p>如果要做分布式评估，只需要将 <code>validation_dataloader</code> 也传入 <code>prepare()</code>，代码如下：</p>
 <pre><code class="language-python">validation_dataloader = accelerator.prepare(validation_dataloader)
 </code></pre>
@@ -169,14 +168,14 @@ accelerator = Accelerator()
     metric.add_batch(all_predictions, all_targets)
 </code></pre>
 <p>注意：函数 <code>gather()</code> 要求所有的 tensor 具有相同的维度。比如：每个GPU上的数据在 padding 时，padding 的最大长度设置为当前这个 <code>mini_batch=16</code> 条数据中长度最大的那条数据的长度，就会导致多个GPU之间的 tensor 的维度不同，此时函数 <code>gather()</code> 不能正常工作。</p>
-<h2 id="_3">运行分布式脚本</h2>
+<h2 id="3">3、运行分布式脚本</h2>
 <p>没有看</p>
-<h2 id="notebook">使用notebook运行</h2>
+<h2 id="4notebook">4、使用notebook运行</h2>
 <p>没有看</p>
-<h2 id="tpu">在TPU上训练</h2>
+<h2 id="5tpu">5、在TPU上训练</h2>
 <p>我哪有TPU</p>
-<h2 id="_4">其他注意点说明</h2>
-<h3 id="_5">程序只在一个进程中执行</h3>
+<h2 id="6">6、其他注意点说明</h2>
+<h3 id="_1">使某些程序只在一个进程中执行</h3>
 <p>在分布式训练的时候，以多GPU为例，我们的程序会同时运行在多张显卡上。那么比如打印日志、打印进度条等功能，只希望其执行一次就行了，否则如果有8张显卡，同一条日志打印8次看起来很不方便。</p>
 <p>想要实现并发训练时程序只执行一次，只需将程序包到如下 <code>if</code> 判断内部即可：</p>
 <pre><code class="language-python">if accelerator.is_local_main_process:
@@ -194,13 +193,13 @@ progress_bar = tqdm(range(args.max_train_steps), disable=not accelerator.is_loca
     # Is executed once only
 </code></pre>
 <p>最后，由于 <code>print</code> 函数使用比较频繁，每次包到 <code>if</code> 分支中比较麻烦，accelerator对其单独做了处理。直接使用 <code>accelerator.print</code> 即可实现在每台机器中只打印一次的功能。</p>
-<h3 id="_6">等待所有进程完成，再继续执行</h3>
+<h3 id="_2">等待所有进程完成，再继续执行</h3>
 <p>在进行分布式训练时，不可避免的会出现有的进程执行的快、有的进程执行的慢的情况。而有些时候我们希望每个进程都已经执行完了各自需要执行的内容之后，再进行后面的。可以使用如下代码实现该功能：</p>
 <pre><code class="language-python">accelerator.wait_for_everyone()
 </code></pre>
 <p>这行代码的作用为：先执行到这行代码的进程阻塞，一直等待到所有的进程都执行到了这行代码之后，再同时开始执行后面的代码；</p>
 <p>如果是只有一个进程，那么上面这行代码什么都不做。</p>
-<h3 id="_7">保存和加载模型</h3>
+<h3 id="_3">保存和加载模型</h3>
 <h3 id="gradient-clipping">Gradient clipping</h3>
 <p>如果之前在训练过程中使用了 gradient clipping，那么需要:</p>
 <ul>
@@ -211,14 +210,14 @@ progress_bar = tqdm(range(args.max_train_steps), disable=not accelerator.is_loca
 <p>使用函数 <code>accelerator.clip_grad_value_</code> 替换原来的 <code>torch.nn.utils.clip_grad_value_</code>；</p>
 </li>
 </ul>
-<h3 id="_8">混合精度</h3>
+<h3 id="_4">混合精度</h3>
 <h3 id="deepspeed">DeepSpeed</h3>
-<h2 id="_9">内部原理和机制</h2></div>
+<h2 id="7">7、内部原理和机制</h2></div>
                 </div>
                 <footer>
     <div class="footer-buttons">
         <div class="previous"><a href=".." title="Accelerate"><span>Previous</span></a></div>
-        <div class="next"><a href="../accelerator/" title="Accelerator"><span>Next</span></a></div>
+        <div class="next"><a href="../Installation/" title="Installation"><span>Next</span></a></div>
     </div>
     <div class="footer-note">
         <p>
