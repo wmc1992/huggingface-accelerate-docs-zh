@@ -2,7 +2,7 @@
 
 ## 主要用法
 
-在之前的文档 [Accelerate](./Accelerate.md) 中已经看到过要想使用Accelerate需要做的代码修改如下所示：
+在之前的文档 [Accelerate](..) 中已经看到过要想使用Accelerate需要做的代码修改如下所示：
 
 <div><pre><code class="language-python hljs">
 <font color=green>+ from accelerate import Accelerator</font>
@@ -29,7 +29,7 @@
 
 上述代码的修改可以分为四个步骤进行：
 
-1. import 并实例化 Accelerator 对象，代码如下：
+**步骤一**：import 并实例化 Accelerator 对象，代码如下：
 
 ```python
 from accelerate import Accelerator
@@ -41,7 +41,7 @@ accelerator = Accelerator()
 
 需要注意的一点是：上述初始化代码必须要在所有训练有关的代码之前执行；
 
-2. 删除原代码中的 `to(device)` 和 `cuda()`，Accelerator 会自动将model、data等放到正确的设备上，开发者不用关心。
+**步骤二**：删除原代码中的 `to(device)` 和 `cuda()`，Accelerator 会自动将model、data等放到正确的设备上，开发者不用关心。
 
 当然，如果是高端玩家想要自己指定设备信息也可以，此时 `to(device)` 中的 `device` 需要是 `accelerator.device`。
 
@@ -51,22 +51,24 @@ accelerator = Accelerator()
 accelerator = Accelerator(device_placement=False)
 ```
 
-3. 将所有和训练相关的对象（`optimizer`, `model`, `training dataloader`）传入函数 `prepare()`。该步骤应该放在所有相关对象初始化之后，和训练开始之前。代码如下：
+**步骤三**：将所有和训练相关的对象（`optimizer`, `model`, `training dataloader`）传入函数 `prepare()`。该步骤应该放在所有相关对象初始化之后，和训练开始之前。代码如下：
 
-```
+```python
 model, optimizer, train_dataloader = accelerator.prepare(model, optimizer, train_dataloader)
 ```
 
-**对 `train_dataloader` 说明**：当做分布式训练时，以多GPU为例，所有的训练数据会平均分配到每个GPU上。当训练数据需要 shuffle 时，其实现原理是：
+> **注意：**
+>
+> **`train_dataloader`**：当做分布式训练时，以多GPU为例，所有的训练数据会平均分配到每个GPU上。当训练数据需要 shuffle 时，其实现原理是：
+>
+> * 将随机状态（random state）同步到所有的GPU，以此保证每个GPU上训练数据 shuffle 之后的顺序是相同的；
+> * 每个GPU读取 shuffle 后的训练数据的不同片段；比如有2个GPU时，第一个GPU读取第 `[1, 3, 5, 7, ...]` 条数据，第二个GPU读取第 `[0, 2, 4, 6, ...]` 条数据；
+>
+> **`batch_size`**：当做分布式训练时，以多GPU为例：实际的batch_size = 输入的batch_size * GPU数量。比如输入batch_size为16，当使用4个GPU进行分布式训练时，实际的batch_size为64。
+>
+> **`validation dataloader`**：上面传入 `prepare()` 的只有 `train_dataloader`，另外 `validation dataloader` 也可以传入 `prepare()`，具体的使用方式见下面的**分布式评估**部分。
 
-* 将随机状态（random state）同步到所有的GPU，以此保证每个GPU上训练数据 shuffle 之后的顺序是相同的；
-* 每个GPU读取 shuffle 后的训练数据的不同片段；比如有2个GPU时，第一个GPU读取第 `[1, 3, 5, 7, ...]` 条数据，第二个GPU读取第 `[0, 2, 4, 6, ...]` 条数据；
-
-**对 `batch_size` 说明**：当做分布式训练时，以多GPU为例：实际的batch_size = 输入的batch_size * GPU数量。比如输入batch_size为16，当使用4个GPU进行分布式训练时，实际的batch_size为64。
-
-**对 `validation dataloader` 说明**：上面传入 `prepare()` 的只有 `train_dataloader`，另外 `validation dataloader` 也可以传入 `prepare()`，具体的使用方式见下面的**分布式评估**部分。
-
-4. 将 `loss.backward()` 替换成 `accelerator.backward(loss)`。
+**步骤四**：将 `loss.backward()` 替换成 `accelerator.backward(loss)`。
 
 完成以上四个步骤之后就可以正常的使用 Accelerator 了。
 
@@ -107,8 +109,6 @@ for inputs, targets in validation_dataloader:
 ## 其他注意点说明
 
 ### 程序只在一个进程中执行
-
-> 注：todo 这里需要看一下原文档中的 `process` 是否真的是平时所说的 "进程" 的意思？看源码确认一下；
 
 在分布式训练的时候，以多GPU为例，我们的程序会同时运行在多张显卡上。那么比如打印日志、打印进度条等功能，只希望其执行一次就行了，否则如果有8张显卡，同一条日志打印8次看起来很不方便。
 

@@ -1,4 +1,8 @@
 function ready() {
+  $("pre code").html(function(index, html) {
+    return html.trim().replace(/^(.*)$/mg, "<span class=\"line\">$1</span>");
+  });
+
   $('.nav .section').each(function() {
     $(this).click(function(e) {
       $(this).toggleClass("hide");
