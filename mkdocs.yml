@@ -14,7 +14,7 @@ nav:
   - Accelerate: README.md
   - Get Started:
       - Quick tour: quick_tour.md
-      - Installation: installation.md
+      - Installation: Installation.md
   - API Reference:
       - Accelerator: accelerator.md
       - Notebook Launcher: notebook_launcher.md

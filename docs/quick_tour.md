@@ -1,6 +1,6 @@
 # Quick tour
 
-## 主要用法
+## 1、主要用法
 
 在之前的文档 [Accelerate](..) 中已经看到过要想使用Accelerate需要做的代码修改如下所示：
 
@@ -72,7 +72,7 @@ model, optimizer, train_dataloader = accelerator.prepare(model, optimizer, train
 
 完成以上四个步骤之后就可以正常的使用 Accelerator 了。
 
-## 分布式评估
+## 2、分布式评估
 
 如果要做分布式评估，只需要将 `validation_dataloader` 也传入 `prepare()`，代码如下：
 
@@ -94,21 +94,21 @@ for inputs, targets in validation_dataloader:
 
 注意：函数 `gather()` 要求所有的 tensor 具有相同的维度。比如：每个GPU上的数据在 padding 时，padding 的最大长度设置为当前这个 `mini_batch=16` 条数据中长度最大的那条数据的长度，就会导致多个GPU之间的 tensor 的维度不同，此时函数 `gather()` 不能正常工作。
 
-## 运行分布式脚本
+## 3、运行分布式脚本
 
 没有看
 
-## 使用notebook运行
+## 4、使用notebook运行
 
 没有看
 
-## 在TPU上训练
+## 5、在TPU上训练
 
 我哪有TPU
 
-## 其他注意点说明
+## 6、其他注意点说明
 
-### 程序只在一个进程中执行
+### 使某些程序只在一个进程中执行
 
 在分布式训练的时候，以多GPU为例，我们的程序会同时运行在多张显卡上。那么比如打印日志、打印进度条等功能，只希望其执行一次就行了，否则如果有8张显卡，同一条日志打印8次看起来很不方便。
 
@@ -169,4 +169,4 @@ accelerator.wait_for_everyone()
 
 ### DeepSpeed
 
-## 内部原理和机制
+## 7、内部原理和机制
