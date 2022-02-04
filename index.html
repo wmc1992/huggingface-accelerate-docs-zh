@@ -94,7 +94,7 @@
 </nav>
                     <hr>
                     <div class="content"><h1 id="accelerate">Accelerate</h1>
-<h3 id="_1">特征</h3>
+<h2 id="_1">特征</h2>
 <ul>
 <li>
 <p>提供混合精度、分布式训练（单多GPU、多机多GPU、TPU等等）等功能，在原训练代码的基础上只需要修改少量代码；</p>
@@ -103,7 +103,7 @@
 <p>提供命令行工具可以快速测试本地环境</p>
 </li>
 </ul>
-<h3 id="_2">用法简单，代码修改量少</h3>
+<h2 id="_2">用法简单，代码修改量少</h2>
 <p>传统的使用pytorch的训练代码一般如下：</p>
 <pre><code class="language-python">my_model.to(device)
 
@@ -171,31 +171,52 @@ for batch in my_training_dataloader:
 <font>      my_optimizer.step()</font>
 </code></pre></div>
 
-<h3 id="_3">支持的分布式环境（非分布式也支持）</h3>
+<h2 id="_3">支持的环境</h2>
 <ul>
 <li>
-<p>CPU only</p>
+<p>CPU</p>
 </li>
 <li>
-<p>single GPU</p>
+<p>单GPU</p>
 </li>
 <li>
-<p>multi-GPU on one node (machine)</p>
+<p>多GPU单节点</p>
 </li>
 <li>
-<p>multi-GPU on several nodes (machines)</p>
+<p>多GPU多节点</p>
 </li>
 <li>
 <p>TPU</p>
 </li>
 <li>
-<p>FP16 with native AMP (apex on the roadmap)</p>
+<p>FP16 with native AMP</p>
 </li>
 <li>
-<p>DeepSpeed (experimental support)</p>
+<p>DeepSpeed</p>
 </li>
 </ul>
-<h3 id="_4">目录</h3></div>
+<h2 id="_4">目录</h2>
+<h4 id="get-started">Get Started</h4>
+<ul>
+<li><a href="quick_tour/">Quick tour</a><ul>
+<li>主要用法</li>
+<li>分布式评估</li>
+<li>运行分布式脚本</li>
+<li>使用notebook运行</li>
+<li>在TPU上训练</li>
+<li>其他注意点说明</li>
+<li>内部原理和机制</li>
+</ul>
+</li>
+<li><a href="Installation/">Installation</a></li>
+</ul>
+<h4 id="api-reference">API Reference</h4>
+<ul>
+<li><a href="accelerator/">Accelerate</a></li>
+<li><a href="notebook_launcher/">Notebook Launcher</a></li>
+<li><a href="kwargs_handlers/">Kwargs Handlers</a></li>
+<li><a href="internals/">Internals</a></li>
+</ul></div>
                 </div>
                 <footer>
     <div class="footer-buttons">
